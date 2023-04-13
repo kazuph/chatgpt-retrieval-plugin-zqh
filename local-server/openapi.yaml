@@ -3,33 +3,86 @@ info:
   title: Retrieval Plugin API
   description: A retrieval API for querying and filtering documents based on natural language queries and metadata
   version: 1.0.0
-  servers:
-    - url: http://localhost:3333
+servers:
+  - url: 'http://localhost:3333'
+    description: Development server
 paths:
   /query:
     post:
       summary: Query
-      description: Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don't do this often. Split queries if ResponseTooLargeError occurs.
+      description: 'Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don''t do this often. Split queries if ResponseTooLargeError occurs.'
       operationId: query_query_post
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QueryRequest"
+              $ref: '#/components/schemas/QueryRequest'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/QueryResponse"
-        "422":
+                $ref: '#/components/schemas/QueryResponse'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HTTPValidationError"
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/serach/{keywords}':
+    get:
+      summary: Keyword Search
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+      operationId: keyword-search
+      description: API to search articles by keywords.
+      parameters:
+        - schema:
+            type: integer
+            example: 3
+            default: 3
+            format: int32
+          in: query
+          name: users
+          description: 'Score number of references to an article. The larger, the more popular.'
+        - schema:
+            type: string
+            enum:
+              - recent
+              - popular
+            default: recent
+          in: query
+          name: sort
+          description: 'recent: is based on the latest date, and popular: is based on the score.'
+        - schema:
+            type: string
+            enum:
+              - all
+              - tag
+              - title
+              - text
+            example: all
+            default: all
+          in: query
+          name: target
+          required: true
+          description: 'The search range expands in the order of tag,title,text,all.'
+    parameters:
+      - schema:
+          type: string
+          example: python+ruby
+        name: keywords
+        in: path
+        required: true
+        description: One or more KEYWORDS to search for articles
 components:
   schemas:
     DocumentChunkMetadata:
@@ -37,7 +90,7 @@ components:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/Source"
+          $ref: '#/components/schemas/Source'
         source_id:
           title: Source Id
           type: string
@@ -52,6 +105,8 @@ components:
           type: string
         document_id:
           title: Document Id
+          type: string
+        title:
           type: string
     DocumentChunkWithScore:
       title: DocumentChunkWithScore
@@ -68,7 +123,7 @@ components:
           title: Text
           type: string
         metadata:
-          $ref: "#/components/schemas/DocumentChunkMetadata"
+          $ref: '#/components/schemas/DocumentChunkMetadata'
         embedding:
           title: Embedding
           type: array
@@ -85,7 +140,7 @@ components:
           title: Document Id
           type: string
         source:
-          $ref: "#/components/schemas/Source"
+          $ref: '#/components/schemas/Source'
         source_id:
           title: Source Id
           type: string
@@ -106,7 +161,7 @@ components:
           title: Detail
           type: array
           items:
-            $ref: "#/components/schemas/ValidationError"
+            $ref: '#/components/schemas/ValidationError'
     Query:
       title: Query
       required:
@@ -117,7 +172,7 @@ components:
           title: Query
           type: string
         filter:
-          $ref: "#/components/schemas/DocumentMetadataFilter"
+          $ref: '#/components/schemas/DocumentMetadataFilter'
         top_k:
           title: Top K
           type: integer
@@ -132,7 +187,7 @@ components:
           title: Queries
           type: array
           items:
-            $ref: "#/components/schemas/Query"
+            $ref: '#/components/schemas/Query'
     QueryResponse:
       title: QueryResponse
       required:
@@ -143,7 +198,7 @@ components:
           title: Results
           type: array
           items:
-            $ref: "#/components/schemas/QueryResult"
+            $ref: '#/components/schemas/QueryResult'
     QueryResult:
       title: QueryResult
       required:
@@ -158,15 +213,15 @@ components:
           title: Results
           type: array
           items:
-            $ref: "#/components/schemas/DocumentChunkWithScore"
+            $ref: '#/components/schemas/DocumentChunkWithScore'
     Source:
       title: Source
-      enum:
-        - email
-        - file
-        - chat
       type: string
       description: An enumeration.
+      enum:
+        - zenn
+        - qiita
+        - hatena
     ValidationError:
       title: ValidationError
       required:

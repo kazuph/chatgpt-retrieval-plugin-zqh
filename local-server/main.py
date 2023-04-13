@@ -1,6 +1,8 @@
 # This is a version of the main.py file found in ../../../server/main.py for testing the plugin locally.
 # Use the command `poetry run dev` to run this.
 from typing import Optional
+
+import feedparser
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, Body, UploadFile
 
@@ -17,9 +19,10 @@ from services.file import get_document_from_file
 
 from starlette.responses import FileResponse
 
-from models.models import DocumentMetadata, Source
+from models.models import DocumentMetadata, Source, DocumentChunkWithScore, QueryResult
 from fastapi.middleware.cors import CORSMiddleware
 
+from services.hatena_bookmark import search_hatena_bookmark
 
 app = FastAPI()
 
@@ -105,6 +108,16 @@ async def query_main(request: QueryRequest = Body(...)):
         results = await datastore.query(
             request.queries,
         )
+        return QueryResponse(results=results)
+    except Exception as e:
+        print("Error:", e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.get("/search/{keywords}", response_model=QueryResponse)
+async def search(keywords, users=3, sort="popular", target="all"):
+    try:
+        results = search_hatena_bookmark(keywords, users, sort, target)
         return QueryResponse(results=results)
     except Exception as e:
         print("Error:", e)

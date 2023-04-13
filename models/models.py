@@ -4,15 +4,16 @@ from enum import Enum
 
 
 class Source(str, Enum):
-    email = "email"
-    file = "file"
-    chat = "chat"
+    zenn = "zenn"
+    qiita = "qiita"
+    hatena = "hatena"
 
 
 class DocumentMetadata(BaseModel):
     source: Optional[Source] = None
     source_id: Optional[str] = None
     url: Optional[str] = None
+    title: Optional[str] = None
     created_at: Optional[str] = None
     author: Optional[str] = None
 
