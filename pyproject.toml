@@ -26,6 +26,7 @@ qdrant-client = {version = "^1.0.4", python = "<3.12"}
 feedparser = "^6.0.10"
 beautifulsoup4 = "^4.12.2"
 pytz = "^2023.3"
+unstructured = "^0.6.2"
 
 [tool.poetry.scripts]
 start = "server.main:start"
