@@ -1,24 +1,21 @@
-from datetime import datetime
-
-import pytz
 import httpx
 from bs4 import BeautifulSoup
+from unstructured.partition.html import partition_html
 
 from models.models import Source
 
 PLUGIN_HOST = 'http://localhost:3333'
 
 sites = [
-    # (Source.qiita, 'https://b.hatena.ne.jp/site/qiita.com'),
-    # (Source.zenn, 'https://b.hatena.ne.jp/site/zenn.dev'),
-    # テクノロジー - プログラミング
-    (Source.hatena, 'https://b.hatena.ne.jp/entrylist/it/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0'),
+    (Source.qiita, 'https://b.hatena.ne.jp/site/qiita.com'),
+    (Source.zenn, 'https://b.hatena.ne.jp/site/zenn.dev'),
+    (Source.hatena, 'https://b.hatena.ne.jp/entrylist/it/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0'), # テクノロジー - プログラミング
 ]
 
-def fetch_and_upsert(site):
+def fetch_and_upsert(site, pages=50, offset=1):
     (source, feed_url) = site
 
-    for page in range(1, 50):
+    for page in range(offset, pages+1):
         url = f'{feed_url}?page={page}&sort=recent&threshold=3&mode=text'
         print(f"fetching {url}")
         soup = BeautifulSoup(httpx.get(url).text, 'html.parser')
@@ -50,4 +47,4 @@ def fetch_and_upsert(site):
 
 if __name__ == '__main__':
     for site in sites:
-        fetch_and_upsert(site)
+        fetch_and_upsert(site, pages=10)
