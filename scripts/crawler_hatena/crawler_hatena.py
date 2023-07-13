@@ -1,16 +1,18 @@
 import httpx
 from bs4 import BeautifulSoup
 from unstructured.partition.html import partition_html
-
 from models.models import Source
+import time
+
 
 PLUGIN_HOST = 'http://localhost:3333'
 
 sites = [
     (Source.qiita, 'https://b.hatena.ne.jp/site/qiita.com'),
     (Source.zenn, 'https://b.hatena.ne.jp/site/zenn.dev'),
-    (Source.hatena, 'https://b.hatena.ne.jp/entrylist/it/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0'), # テクノロジー - プログラミング
+    (Source.hatena, 'https://b.hatena.ne.jp/entrylist/it/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0'),  # テクノロジー - プログラミング
 ]
+
 
 def fetch_and_upsert(site, pages=50, offset=1):
     (source, feed_url) = site
@@ -24,6 +26,7 @@ def fetch_and_upsert(site, pages=50, offset=1):
         for item in entrylist:
             title = item.h3.a.text
             link = item.h3.a['href']
+            print(f"title: {title}, link: {link}")
             try:
                 elements = partition_html(url=link)
                 summary = "\n\n".join([str(el) for el in elements])
@@ -39,6 +42,7 @@ def fetch_and_upsert(site, pages=50, offset=1):
                     }
                 }
                 documents.append(doc)
+                time.sleep(1)
             except ValueError as e:
                 print(f"error: {e}. link: {link}")
                 continue

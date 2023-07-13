@@ -6,6 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+      DATASTORE: qdrant
+      BEARER_TOKEN: 35c4afe3b6aa31bdf621e8cfbe008cadd940fe365ab8e01409e46b57222b7023
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
       QDRANT_URL: qdrant
       QDRANT_PORT: 6333
       QDRANT_GRPC_PORT: 6334
@@ -13,12 +16,15 @@ services:
       QDRANT_COLLECTION: zqh
     ports:
       - "8080:8080"
+      - "3333:3333"
     depends_on:
       - qdrant
 
   qdrant:
-    image: generall/qdrant:latest
+    image: qdrant/qdrant:v1.3.2
     ports:
       - "6333:6333"
       - "6334:6334"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
 

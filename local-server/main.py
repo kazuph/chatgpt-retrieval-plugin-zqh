@@ -155,4 +155,5 @@ async def startup():
 
 
 def start():
-    uvicorn.run("local-server.main:app", host="localhost", port=PORT, reload=True)
+    uvicorn.run("local-server.main:app",
+                host="0.0.0.0", port=PORT, reload=True)

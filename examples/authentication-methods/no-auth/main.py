@@ -66,6 +66,7 @@ async def upsert_file(
 async def upsert(
     request: UpsertRequest = Body(...),
 ):
+    print(f"/upsert: {request.documents}")
     try:
         ids = await datastore.upsert(request.documents)
         return UpsertResponse(ids=ids)
